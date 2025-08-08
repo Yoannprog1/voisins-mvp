@@ -39,7 +39,6 @@ jobs:
 
       - name: Ensure android folder exists
         run: flutter create --project-name voisins_mvp --platforms=android .
-.
 
       - name: Get packages
         run: flutter pub get
@@ -55,4 +54,3 @@ jobs:
         with:
           name: app-debug
           path: build/app/outputs/flutter-apk/app-debug.apk
-        
