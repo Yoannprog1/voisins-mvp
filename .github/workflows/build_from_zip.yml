@@ -1,36 +1,24 @@
-name: Build Android APK from ZIP
+
+name: Build APK
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/build_from_zip.yml"
-      - "**/*.zip"
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Find & unzip ZIP
-        run: |
-          ZIP_FILE=$(git ls-files '**/*.zip' | head -n 1)
-          echo "Found: $ZIP_FILE"
-          test -n "$ZIP_FILE"
-          unzip -o "$ZIP_FILE" -d .
-
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
       - uses: android-actions/setup-android@v3
       - uses: subosito/flutter-action@v2
         with: { channel: stable, flutter-version: "3.22.2" }
-
-      - name: Create android folders
-        run: flutter create --project-name voisins_v2 --platforms=android .
-
+      - name: Ensure Android project exists
+        run: |
+          if [ ! -f android/app/build.gradle ]; then
+            flutter create --platforms=android .
+          fi
       - run: flutter pub get
       - run: yes | sdkmanager --licenses
       - run: flutter build apk --debug
-
       - uses: actions/upload-artifact@v4
         with: { name: app-debug, path: build/app/outputs/flutter-apk/app-debug.apk }
